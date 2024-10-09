@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 
+/**
+ * Wrapper for printf or whatever one desires to use for logging.
+ */
 void log(const char *format, ...) {
   va_list args;
   va_start(args, format);
@@ -9,18 +12,27 @@ void log(const char *format, ...) {
   va_end(args);
 }
 
+/**
+ * C to Pascal String.
+ */
 void CtoPStr(const char* cString, Str255 pStr) {
   size_t len = strlen(cString);
   pStr[0] = len;
   memcpy(&pStr[1], cString, len);
 }
 
+/**
+ * Pascal to C String.
+ */
 void PtoCStr(const unsigned char *pStr, char *cStr) {
   unsigned char length = pStr[0];
   memcpy(cStr, &pStr[1], length);
   cStr[length] = '\0';
 }
 
+/**
+ * Error codes for GetVol.
+ */
 void printGetVolError(OSErr err) {
   log("Error %d\n", err);
   switch(err) {
@@ -37,6 +49,9 @@ void printGetVolError(OSErr err) {
   log("\n");
 }
 
+/**
+ * Error codes for GetWDInfo.
+ */
 void printGetWDInfoError(OSErr err) {
   log("Error %d\n", err);
   switch(err) {
@@ -56,6 +71,9 @@ void printGetWDInfoError(OSErr err) {
   log("\n");
 }
 
+/**
+ * Error codes for PBGetCatInfo.
+ */
 void printPBGetCatInfoError(OSErr err) {
   log("Error %d\n", err);  
   switch(err) {
@@ -96,6 +114,10 @@ void printPBGetCatInfoError(OSErr err) {
 
 /**
  * getFileInformation returns information about a file.
+ * This implementation searches for relative path.
+ * It's not encouraged to use full paths on Mac OS, so any other file checks
+ * would involve the GUI.
+ * As it uses relative paths, this doesn't work with application packages.
  *
  * @param (const char) fileName - A C string. The file or directory we want to
  *                                check.
