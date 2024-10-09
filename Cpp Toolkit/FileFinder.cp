@@ -22,11 +22,38 @@ void PtoCStr(const unsigned char *pStr, char *cStr) {
 }
 
 void printGetVolError(OSErr err) {
-    log("Error %d\n", err);
+  log("Error %d\n", err);
+  switch(err) {
+    case 0:
+      log("No error");
+      break;
+    case -35:
+      log("No such volume");
+      break;
+    default:
+      log("No idea!");
+      break;
+  }
+  log("\n");
 }
 
 void printGetWDInfoError(OSErr err) {
-    log("Error %d\n", err);
+  log("Error %d\n", err);
+  switch(err) {
+    case 0:
+      log("No error");
+      break;
+    case -35:
+      log("No such volume");
+      break;
+    case -51:
+      log("Bad working directory reference number");
+      break;
+    default:
+      log("No idea!");
+      break;
+  }
+  log("\n");
 }
 
 void printPBGetCatInfoError(OSErr err) {
@@ -63,7 +90,6 @@ void printPBGetCatInfoError(OSErr err) {
       log("No idea!");
       break;
   }
-  
   log("\n");
 }
 
@@ -146,11 +172,16 @@ int getFileInformation(const char* fileName, bool *exists, bool *isFile, bool *i
   err = PBGetCatInfoSync(&catInfo);
   if (err == noErr) {
     *exists = true;
+    /*
+     * The ioDirMask constant is part of the ioFlAttrib field in the CInfoPBRec
+     * structure, which is returned by various file system calls in the
+     * Macintosh Toolbox. This checks if the file is a directory by looking for
+     * the ioDirMask bit being set in the ioFlAttrib attribute field.
+     * ioDirMask's value is 0x10.
+     */
     if (catInfo.hFileInfo.ioFlAttrib & ioDirMask) {
-      // log("Path is a directory.\n");
       *isDir = true;
     } else {
-      // log("Path is a regular file.\n");
       *isFile = true;
     }
   } else {
@@ -166,7 +197,7 @@ int main(void) {
   bool isDir;
   bool exists;
 
-  getFileInformation("abce", &exists, &isFile, &isDir);
+  getFileInformation("abc", &exists, &isFile, &isDir);
   log(
     "abc %s%s%s",
     exists ? "exists" : "doesn't exist",
